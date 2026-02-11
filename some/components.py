@@ -923,7 +923,7 @@ def quiz_component() -> rx.Component:
                     ),
                 ),
             ),
-            min_height="300px",
+            min_height="18.75rem",
         ),
         # Navigation buttons
         rx.flex(

@@ -101,7 +101,8 @@ class QuizState(rx.State):
             self.accuracy_reasoning = accuracy.get("reasoning", "Unknown")
             self.view = "results"
         except Exception as e:
-            self.error_message = str(e) or "Error loading recommendations. Please ensure your API key is set."
+            error_str = str(e)
+            self.error_message = error_str if error_str else "Error loading recommendations. Please ensure your API key is set."
             self.view = "welcome"
     
     async def search_game(self):
