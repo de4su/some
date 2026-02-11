@@ -126,12 +126,12 @@ class QuizState(rx.State):
         finally:
             self.is_searching = False
     
-    @property
+    @rx.var
     def progress_percentage(self) -> int:
         """Calculate quiz progress percentage."""
         return int(((self.quiz_step + 1) / 4) * 100)
     
-    @property
+    @rx.var
     def can_advance(self) -> bool:
         """Check if user can advance from current step."""
         if self.quiz_step == 0:

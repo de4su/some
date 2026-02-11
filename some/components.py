@@ -5,24 +5,16 @@ from typing import Dict, Any, List
 
 def game_card(game: Dict[str, Any]) -> rx.Component:
     """Render a game card with Steam-like styling."""
-    steam_app_id = game.get("steamAppId", "")
+    steam_app_id = game["steamAppId"]
     static_image = f"https://cdn.akamai.steamstatic.com/steam/apps/{steam_app_id}/header.jpg"
     store_url = f"https://store.steampowered.com/app/{steam_app_id}"
     
-    title = game.get("title", "Unknown")
-    description = game.get("description", "")
-    main_story_time = game.get("mainStoryTime", 0)
-    completionist_time = game.get("completionistTime", 0)
-    suitability_score = game.get("suitabilityScore", 0)
-    reason_for_pick = game.get("reasonForPick", "")
-    
-    # Determine score color
-    if suitability_score >= 90:
-        score_classes = "text-green-400 border-green-500 bg-green-500/20"
-    elif suitability_score >= 75:
-        score_classes = "text-blue-400 border-blue-500 bg-blue-500/20"
-    else:
-        score_classes = "text-yellow-400 border-yellow-500 bg-yellow-500/20"
+    title = game["title"]
+    description = game["description"]
+    main_story_time = game["mainStoryTime"]
+    completionist_time = game["completionistTime"]
+    suitability_score = game["suitabilityScore"]
+    reason_for_pick = game["reasonForPick"]
     
     return rx.link(
         rx.box(
@@ -38,7 +30,7 @@ def game_card(game: Dict[str, Any]) -> rx.Component:
                 ),
                 # Score badge
                 rx.box(
-                    f"{suitability_score}%",
+                    rx.text(f"{suitability_score}%"),
                     position="absolute",
                     top="1rem",
                     left="1rem",
@@ -51,7 +43,9 @@ def game_card(game: Dict[str, Any]) -> rx.Component:
                     z_index="10",
                     box_shadow="0 25px 50px -12px rgba(0, 0, 0, 0.5)",
                     backdrop_filter="blur(8px)",
-                    class_name=score_classes,
+                    color="#60a5fa",
+                    border_color="#60a5fa",
+                    background="rgba(96, 165, 250, 0.2)",
                 ),
                 # Gradient overlay
                 rx.box(
@@ -160,7 +154,7 @@ def game_card(game: Dict[str, Any]) -> rx.Component:
                         gap="0.75rem",
                         align_items="center",
                     ),
-                    justify="space-between",
+                    justify="between",
                     align_items="center",
                     margin_bottom="1.5rem",
                 ),
@@ -274,7 +268,7 @@ def quiz_component() -> rx.Component:
                     letter_spacing="0.1em",
                     text_transform="uppercase",
                 ),
-                justify="space-between",
+                justify="between",
                 margin_bottom="0.75rem",
             ),
             rx.box(
@@ -315,48 +309,276 @@ def quiz_component() -> rx.Component:
                         font_size="0.875rem",
                     ),
                     rx.grid(
-                        *[
-                            rx.button(
-                                genre,
-                                on_click=lambda g=genre: QuizState.toggle_genre(g),
-                                padding="0.75rem",
-                                border_radius="0.125rem",
-                                border_width="1px",
-                                font_size="0.75rem",
-                                font_weight="700",
-                                text_transform="uppercase",
-                                letter_spacing="0.05em",
-                                transition="all 0.2s",
-                                background=rx.cond(
-                                    QuizState.preferred_genres.contains(genre),
-                                    "#2563eb",
-                                    "rgba(31, 41, 55, 0.3)",
-                                ),
-                                border_color=rx.cond(
-                                    QuizState.preferred_genres.contains(genre),
-                                    "#60a5fa",
-                                    "rgba(255, 255, 255, 0.05)",
-                                ),
-                                color=rx.cond(
-                                    QuizState.preferred_genres.contains(genre),
-                                    "white",
-                                    "#6b7280",
-                                ),
-                                _hover={
-                                    "border_color": rx.cond(
-                                        QuizState.preferred_genres.contains(genre),
-                                        "#60a5fa",
-                                        "#4b5563",
-                                    ),
-                                    "color": rx.cond(
-                                        QuizState.preferred_genres.contains(genre),
-                                        "white",
-                                        "#d1d5db",
-                                    ),
-                                },
-                            )
-                            for genre in QuizState.GENRES
-                        ],
+                        rx.button(
+                            "Action",
+                            on_click=lambda: QuizState.toggle_genre("Action"),
+                            padding="0.75rem",
+                            border_radius="0.125rem",
+                            border_width="1px",
+                            font_size="0.75rem",
+                            font_weight="700",
+                            text_transform="uppercase",
+                            letter_spacing="0.05em",
+                            transition="all 0.2s",
+                            background=rx.cond(
+                                QuizState.preferred_genres.contains("Action"),
+                                "#2563eb",
+                                "rgba(31, 41, 55, 0.3)",
+                            ),
+                            border_color=rx.cond(
+                                QuizState.preferred_genres.contains("Action"),
+                                "#60a5fa",
+                                "rgba(255, 255, 255, 0.05)",
+                            ),
+                            color=rx.cond(
+                                QuizState.preferred_genres.contains("Action"),
+                                "white",
+                                "#6b7280",
+                            ),
+                        ),
+                        rx.button(
+                            "RPG",
+                            on_click=lambda: QuizState.toggle_genre("RPG"),
+                            padding="0.75rem",
+                            border_radius="0.125rem",
+                            border_width="1px",
+                            font_size="0.75rem",
+                            font_weight="700",
+                            text_transform="uppercase",
+                            letter_spacing="0.05em",
+                            transition="all 0.2s",
+                            background=rx.cond(
+                                QuizState.preferred_genres.contains("RPG"),
+                                "#2563eb",
+                                "rgba(31, 41, 55, 0.3)",
+                            ),
+                            border_color=rx.cond(
+                                QuizState.preferred_genres.contains("RPG"),
+                                "#60a5fa",
+                                "rgba(255, 255, 255, 0.05)",
+                            ),
+                            color=rx.cond(
+                                QuizState.preferred_genres.contains("RPG"),
+                                "white",
+                                "#6b7280",
+                            ),
+                        ),
+                        rx.button(
+                            "Strategy",
+                            on_click=lambda: QuizState.toggle_genre("Strategy"),
+                            padding="0.75rem",
+                            border_radius="0.125rem",
+                            border_width="1px",
+                            font_size="0.75rem",
+                            font_weight="700",
+                            text_transform="uppercase",
+                            letter_spacing="0.05em",
+                            transition="all 0.2s",
+                            background=rx.cond(
+                                QuizState.preferred_genres.contains("Strategy"),
+                                "#2563eb",
+                                "rgba(31, 41, 55, 0.3)",
+                            ),
+                            border_color=rx.cond(
+                                QuizState.preferred_genres.contains("Strategy"),
+                                "#60a5fa",
+                                "rgba(255, 255, 255, 0.05)",
+                            ),
+                            color=rx.cond(
+                                QuizState.preferred_genres.contains("Strategy"),
+                                "white",
+                                "#6b7280",
+                            ),
+                        ),
+                        rx.button(
+                            "Indie",
+                            on_click=lambda: QuizState.toggle_genre("Indie"),
+                            padding="0.75rem",
+                            border_radius="0.125rem",
+                            border_width="1px",
+                            font_size="0.75rem",
+                            font_weight="700",
+                            text_transform="uppercase",
+                            letter_spacing="0.05em",
+                            transition="all 0.2s",
+                            background=rx.cond(
+                                QuizState.preferred_genres.contains("Indie"),
+                                "#2563eb",
+                                "rgba(31, 41, 55, 0.3)",
+                            ),
+                            border_color=rx.cond(
+                                QuizState.preferred_genres.contains("Indie"),
+                                "#60a5fa",
+                                "rgba(255, 255, 255, 0.05)",
+                            ),
+                            color=rx.cond(
+                                QuizState.preferred_genres.contains("Indie"),
+                                "white",
+                                "#6b7280",
+                            ),
+                        ),
+                        rx.button(
+                            "Adventure",
+                            on_click=lambda: QuizState.toggle_genre("Adventure"),
+                            padding="0.75rem",
+                            border_radius="0.125rem",
+                            border_width="1px",
+                            font_size="0.75rem",
+                            font_weight="700",
+                            text_transform="uppercase",
+                            letter_spacing="0.05em",
+                            transition="all 0.2s",
+                            background=rx.cond(
+                                QuizState.preferred_genres.contains("Adventure"),
+                                "#2563eb",
+                                "rgba(31, 41, 55, 0.3)",
+                            ),
+                            border_color=rx.cond(
+                                QuizState.preferred_genres.contains("Adventure"),
+                                "#60a5fa",
+                                "rgba(255, 255, 255, 0.05)",
+                            ),
+                            color=rx.cond(
+                                QuizState.preferred_genres.contains("Adventure"),
+                                "white",
+                                "#6b7280",
+                            ),
+                        ),
+                        rx.button(
+                            "Simulation",
+                            on_click=lambda: QuizState.toggle_genre("Simulation"),
+                            padding="0.75rem",
+                            border_radius="0.125rem",
+                            border_width="1px",
+                            font_size="0.75rem",
+                            font_weight="700",
+                            text_transform="uppercase",
+                            letter_spacing="0.05em",
+                            transition="all 0.2s",
+                            background=rx.cond(
+                                QuizState.preferred_genres.contains("Simulation"),
+                                "#2563eb",
+                                "rgba(31, 41, 55, 0.3)",
+                            ),
+                            border_color=rx.cond(
+                                QuizState.preferred_genres.contains("Simulation"),
+                                "#60a5fa",
+                                "rgba(255, 255, 255, 0.05)",
+                            ),
+                            color=rx.cond(
+                                QuizState.preferred_genres.contains("Simulation"),
+                                "white",
+                                "#6b7280",
+                            ),
+                        ),
+                        rx.button(
+                            "Horror",
+                            on_click=lambda: QuizState.toggle_genre("Horror"),
+                            padding="0.75rem",
+                            border_radius="0.125rem",
+                            border_width="1px",
+                            font_size="0.75rem",
+                            font_weight="700",
+                            text_transform="uppercase",
+                            letter_spacing="0.05em",
+                            transition="all 0.2s",
+                            background=rx.cond(
+                                QuizState.preferred_genres.contains("Horror"),
+                                "#2563eb",
+                                "rgba(31, 41, 55, 0.3)",
+                            ),
+                            border_color=rx.cond(
+                                QuizState.preferred_genres.contains("Horror"),
+                                "#60a5fa",
+                                "rgba(255, 255, 255, 0.05)",
+                            ),
+                            color=rx.cond(
+                                QuizState.preferred_genres.contains("Horror"),
+                                "white",
+                                "#6b7280",
+                            ),
+                        ),
+                        rx.button(
+                            "Puzzle",
+                            on_click=lambda: QuizState.toggle_genre("Puzzle"),
+                            padding="0.75rem",
+                            border_radius="0.125rem",
+                            border_width="1px",
+                            font_size="0.75rem",
+                            font_weight="700",
+                            text_transform="uppercase",
+                            letter_spacing="0.05em",
+                            transition="all 0.2s",
+                            background=rx.cond(
+                                QuizState.preferred_genres.contains("Puzzle"),
+                                "#2563eb",
+                                "rgba(31, 41, 55, 0.3)",
+                            ),
+                            border_color=rx.cond(
+                                QuizState.preferred_genres.contains("Puzzle"),
+                                "#60a5fa",
+                                "rgba(255, 255, 255, 0.05)",
+                            ),
+                            color=rx.cond(
+                                QuizState.preferred_genres.contains("Puzzle"),
+                                "white",
+                                "#6b7280",
+                            ),
+                        ),
+                        rx.button(
+                            "Sports",
+                            on_click=lambda: QuizState.toggle_genre("Sports"),
+                            padding="0.75rem",
+                            border_radius="0.125rem",
+                            border_width="1px",
+                            font_size="0.75rem",
+                            font_weight="700",
+                            text_transform="uppercase",
+                            letter_spacing="0.05em",
+                            transition="all 0.2s",
+                            background=rx.cond(
+                                QuizState.preferred_genres.contains("Sports"),
+                                "#2563eb",
+                                "rgba(31, 41, 55, 0.3)",
+                            ),
+                            border_color=rx.cond(
+                                QuizState.preferred_genres.contains("Sports"),
+                                "#60a5fa",
+                                "rgba(255, 255, 255, 0.05)",
+                            ),
+                            color=rx.cond(
+                                QuizState.preferred_genres.contains("Sports"),
+                                "white",
+                                "#6b7280",
+                            ),
+                        ),
+                        rx.button(
+                            "Racing",
+                            on_click=lambda: QuizState.toggle_genre("Racing"),
+                            padding="0.75rem",
+                            border_radius="0.125rem",
+                            border_width="1px",
+                            font_size="0.75rem",
+                            font_weight="700",
+                            text_transform="uppercase",
+                            letter_spacing="0.05em",
+                            transition="all 0.2s",
+                            background=rx.cond(
+                                QuizState.preferred_genres.contains("Racing"),
+                                "#2563eb",
+                                "rgba(31, 41, 55, 0.3)",
+                            ),
+                            border_color=rx.cond(
+                                QuizState.preferred_genres.contains("Racing"),
+                                "#60a5fa",
+                                "rgba(255, 255, 255, 0.05)",
+                            ),
+                            color=rx.cond(
+                                QuizState.preferred_genres.contains("Racing"),
+                                "white",
+                                "#6b7280",
+                            ),
+                        ),
                         columns="3",
                         spacing="3",
                         margin_bottom="2rem",
@@ -782,7 +1004,7 @@ def quiz_component() -> rx.Component:
                     },
                 ),
             ),
-            justify="space-between",
+            justify="between",
             align_items="center",
             padding_top="1.5rem",
             border_top="1px solid rgba(255, 255, 255, 0.05)",
