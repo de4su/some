@@ -1,0 +1,796 @@
+"""Reusable UI components for the Steam Quest app."""
+import reflex as rx
+from typing import Dict, Any, List
+
+
+def game_card(game: Dict[str, Any]) -> rx.Component:
+    """Render a game card with Steam-like styling."""
+    steam_app_id = game.get("steamAppId", "")
+    static_image = f"https://cdn.akamai.steamstatic.com/steam/apps/{steam_app_id}/header.jpg"
+    store_url = f"https://store.steampowered.com/app/{steam_app_id}"
+    
+    title = game.get("title", "Unknown")
+    description = game.get("description", "")
+    main_story_time = game.get("mainStoryTime", 0)
+    completionist_time = game.get("completionistTime", 0)
+    suitability_score = game.get("suitabilityScore", 0)
+    reason_for_pick = game.get("reasonForPick", "")
+    
+    # Determine score color
+    if suitability_score >= 90:
+        score_classes = "text-green-400 border-green-500 bg-green-500/20"
+    elif suitability_score >= 75:
+        score_classes = "text-blue-400 border-blue-500 bg-blue-500/20"
+    else:
+        score_classes = "text-yellow-400 border-yellow-500 bg-yellow-500/20"
+    
+    return rx.link(
+        rx.box(
+            # Image section
+            rx.box(
+                rx.image(
+                    src=static_image,
+                    alt=title,
+                    width="100%",
+                    height="100%",
+                    object_fit="cover",
+                    loading="lazy",
+                ),
+                # Score badge
+                rx.box(
+                    f"{suitability_score}%",
+                    position="absolute",
+                    top="1rem",
+                    left="1rem",
+                    padding_x="0.75rem",
+                    padding_y="0.375rem",
+                    border_radius="0.25rem",
+                    border_width="2px",
+                    font_size="1rem",
+                    font_weight="900",
+                    z_index="10",
+                    box_shadow="0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+                    backdrop_filter="blur(8px)",
+                    class_name=score_classes,
+                ),
+                # Gradient overlay
+                rx.box(
+                    position="absolute",
+                    inset="0",
+                    background="linear-gradient(to top, rgba(27, 40, 56, 1) 0%, transparent 50%, transparent 100%)",
+                    opacity="0.4",
+                ),
+                position="relative",
+                height="14rem",
+                width="100%",
+                overflow="hidden",
+                background_color="#000",
+            ),
+            # Content section
+            rx.box(
+                # Title
+                rx.heading(
+                    title,
+                    size="7",
+                    font_weight="900",
+                    color="white",
+                    margin_bottom="1.5rem",
+                    letter_spacing="-0.025em",
+                    line_height="1",
+                    text_transform="uppercase",
+                    class_name="group-hover:text-blue-400",
+                    transition="color 0.3s",
+                ),
+                # Stats section
+                rx.flex(
+                    # Main story time
+                    rx.flex(
+                        rx.box(
+                            rx.icon(
+                                tag="clock",
+                                size=24,
+                                color="#60a5fa",
+                            ),
+                            padding="0.625rem",
+                            border_radius="0.5rem",
+                            border="1px solid rgba(96, 165, 250, 0.2)",
+                            background="rgba(59, 130, 246, 0.1)",
+                        ),
+                        rx.box(
+                            rx.text(
+                                "MAIN",
+                                font_size="0.625rem",
+                                color="#6b7280",
+                                text_transform="uppercase",
+                                font_weight="900",
+                                letter_spacing="0.2em",
+                                line_height="1",
+                                margin_bottom="0.375rem",
+                            ),
+                            rx.text(
+                                rx.text.span(f"{main_story_time}", font_size="1.875rem", font_weight="700", color="#dbeafe", line_height="1"),
+                                rx.text.span("h", font_size="0.875rem", margin_left="0.25rem", color="rgba(96, 165, 250, 0.5)"),
+                                font_family="'JetBrains Mono', 'Space Mono', monospace",
+                                line_height="1",
+                            ),
+                        ),
+                        gap="0.75rem",
+                        align_items="center",
+                    ),
+                    # Divider
+                    rx.box(
+                        height="3rem",
+                        width="1px",
+                        background="rgba(255, 255, 255, 0.05)",
+                        margin_x="0.5rem",
+                    ),
+                    # Completionist time
+                    rx.flex(
+                        rx.box(
+                            rx.text(
+                                "COMPLETIONIST",
+                                font_size="0.625rem",
+                                color="#6b7280",
+                                text_transform="uppercase",
+                                font_weight="900",
+                                letter_spacing="0.2em",
+                                line_height="1",
+                                margin_bottom="0.375rem",
+                                text_align="right",
+                            ),
+                            rx.text(
+                                rx.text.span(f"{completionist_time}", font_size="1.875rem", font_weight="700", color="#d8b4fe", line_height="1"),
+                                rx.text.span("h", font_size="0.875rem", margin_left="0.25rem", color="rgba(168, 85, 247, 0.5)"),
+                                font_family="'JetBrains Mono', 'Space Mono', monospace",
+                                line_height="1",
+                            ),
+                            text_align="right",
+                        ),
+                        rx.box(
+                            rx.icon(
+                                tag="star",
+                                size=24,
+                                color="#c084fc",
+                            ),
+                            padding="0.625rem",
+                            border_radius="0.5rem",
+                            border="1px solid rgba(168, 85, 247, 0.2)",
+                            background="rgba(168, 85, 247, 0.1)",
+                        ),
+                        gap="0.75rem",
+                        align_items="center",
+                    ),
+                    justify="space-between",
+                    align_items="center",
+                    margin_bottom="1.5rem",
+                ),
+                # Description
+                rx.text(
+                    f'"{description}"',
+                    font_size="0.875rem",
+                    color="#9ca3af",
+                    margin_bottom="1.5rem",
+                    font_weight="500",
+                    line_height="1.625",
+                    font_style="italic",
+                    opacity="0.8",
+                    overflow="hidden",
+                    display="-webkit-box",
+                    style={
+                        "-webkit-line-clamp": "2",
+                        "-webkit-box-orient": "vertical",
+                    },
+                ),
+                # Curator notes
+                rx.box(
+                    rx.flex(
+                        rx.box(
+                            rx.box(
+                                rx.icon(
+                                    tag="message-circle",
+                                    size=16,
+                                    color="#60a5fa",
+                                ),
+                                padding="0.5rem",
+                                border_radius="0.375rem",
+                                border="1px solid rgba(96, 165, 250, 0.2)",
+                                background="rgba(59, 130, 246, 0.2)",
+                            ),
+                            flex_shrink="0",
+                            margin_top="0.25rem",
+                        ),
+                        rx.box(
+                            rx.text(
+                                "CURATOR NOTES",
+                                font_size="0.625rem",
+                                font_weight="900",
+                                color="#3b82f6",
+                                text_transform="uppercase",
+                                letter_spacing="0.1em",
+                                margin_bottom="0.25rem",
+                            ),
+                            rx.text(
+                                reason_for_pick,
+                                font_size="0.6875rem",
+                                color="rgba(219, 234, 254, 0.6)",
+                                line_height="1.375",
+                                font_weight="500",
+                            ),
+                        ),
+                        gap="1rem",
+                    ),
+                    padding_top="1.25rem",
+                    border_top="1px solid rgba(255, 255, 255, 0.05)",
+                ),
+                padding="1.5rem",
+                display="flex",
+                flex_direction="column",
+                flex="1",
+            ),
+            background_color="rgba(22, 32, 45, 0.8)",
+            border="1px solid rgba(102, 192, 244, 0.05)",
+            border_radius="0.5rem",
+            overflow="hidden",
+            display="flex",
+            flex_direction="column",
+            height="100%",
+            transition="all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1)",
+            box_shadow="0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+            class_name="group",
+            _hover={
+                "border_color": "rgba(102, 192, 244, 0.2)",
+                "transform": "translateY(-8px)",
+                "background_color": "rgba(30, 44, 62, 0.9)",
+                "box_shadow": "0 20px 40px -15px rgba(0, 0, 0, 0.5)",
+            },
+        ),
+        href=store_url,
+        is_external=True,
+        text_decoration="none",
+    )
+
+
+def quiz_component() -> rx.Component:
+    """Render the quiz component."""
+    from some.state import QuizState
+    
+    return rx.box(
+        # Progress indicator
+        rx.box(
+            rx.flex(
+                rx.text(
+                    f"Phase {QuizState.quiz_step + 1} of 4",
+                    font_size="0.75rem",
+                    font_weight="900",
+                    color="#3b82f6",
+                    letter_spacing="0.1em",
+                    text_transform="uppercase",
+                ),
+                rx.text(
+                    f"{QuizState.progress_percentage}% Synchronized",
+                    font_size="0.75rem",
+                    font_weight="900",
+                    color="#3b82f6",
+                    letter_spacing="0.1em",
+                    text_transform="uppercase",
+                ),
+                justify="space-between",
+                margin_bottom="0.75rem",
+            ),
+            rx.box(
+                rx.box(
+                    width=f"{QuizState.progress_percentage}%",
+                    height="100%",
+                    background="linear-gradient(to right, #2563eb, #60a5fa)",
+                    transition="all 0.5s ease-out",
+                ),
+                width="100%",
+                background="rgba(31, 41, 55, 0.5)",
+                height="0.375rem",
+                border_radius="9999px",
+                overflow="hidden",
+                border="1px solid rgba(255, 255, 255, 0.05)",
+            ),
+            margin_bottom="2rem",
+        ),
+        # Quiz content
+        rx.box(
+            # Step 0: Genre selection
+            rx.cond(
+                QuizState.quiz_step == 0,
+                rx.box(
+                    rx.heading(
+                        "Select Categories",
+                        size="8",
+                        font_weight="900",
+                        margin_bottom="0.5rem",
+                        color="white",
+                        text_transform="uppercase",
+                        letter_spacing="-0.025em",
+                    ),
+                    rx.text(
+                        "Choose the genres that define your typical library.",
+                        color="#9ca3af",
+                        margin_bottom="2rem",
+                        font_size="0.875rem",
+                    ),
+                    rx.grid(
+                        *[
+                            rx.button(
+                                genre,
+                                on_click=lambda g=genre: QuizState.toggle_genre(g),
+                                padding="0.75rem",
+                                border_radius="0.125rem",
+                                border_width="1px",
+                                font_size="0.75rem",
+                                font_weight="700",
+                                text_transform="uppercase",
+                                letter_spacing="0.05em",
+                                transition="all 0.2s",
+                                background=rx.cond(
+                                    QuizState.preferred_genres.contains(genre),
+                                    "#2563eb",
+                                    "rgba(31, 41, 55, 0.3)",
+                                ),
+                                border_color=rx.cond(
+                                    QuizState.preferred_genres.contains(genre),
+                                    "#60a5fa",
+                                    "rgba(255, 255, 255, 0.05)",
+                                ),
+                                color=rx.cond(
+                                    QuizState.preferred_genres.contains(genre),
+                                    "white",
+                                    "#6b7280",
+                                ),
+                                _hover={
+                                    "border_color": rx.cond(
+                                        QuizState.preferred_genres.contains(genre),
+                                        "#60a5fa",
+                                        "#4b5563",
+                                    ),
+                                    "color": rx.cond(
+                                        QuizState.preferred_genres.contains(genre),
+                                        "white",
+                                        "#d1d5db",
+                                    ),
+                                },
+                            )
+                            for genre in QuizState.GENRES
+                        ],
+                        columns="3",
+                        spacing="3",
+                        margin_bottom="2rem",
+                        width="100%",
+                    ),
+                ),
+            ),
+            # Step 1: Playstyle
+            rx.cond(
+                QuizState.quiz_step == 1,
+                rx.box(
+                    rx.heading(
+                        "Playstyle Profile",
+                        size="8",
+                        font_weight="900",
+                        margin_bottom="0.5rem",
+                        color="white",
+                        text_transform="uppercase",
+                        letter_spacing="-0.025em",
+                    ),
+                    rx.text(
+                        "How do you prefer to interact with game mechanics?",
+                        color="#9ca3af",
+                        margin_bottom="2rem",
+                        font_size="0.875rem",
+                    ),
+                    rx.vstack(
+                        rx.button(
+                            rx.box(
+                                rx.text(
+                                    "Casual",
+                                    font_size="1.125rem",
+                                    font_weight="900",
+                                    margin_bottom="0.25rem",
+                                    letter_spacing="-0.025em",
+                                    text_transform="capitalize",
+                                ),
+                                rx.text(
+                                    "Focus on relaxation, aesthetics, and low-friction storytelling.",
+                                    font_size="0.75rem",
+                                    opacity="0.7",
+                                    font_weight="500",
+                                ),
+                                text_align="left",
+                            ),
+                            on_click=lambda: QuizState.set_playstyle("casual"),
+                            width="100%",
+                            padding="1.25rem",
+                            border_radius="0.125rem",
+                            border_width="1px",
+                            text_align="left",
+                            transition="all 0.3s",
+                            background=rx.cond(
+                                QuizState.playstyle == "casual",
+                                "#2563eb",
+                                "rgba(31, 41, 55, 0.3)",
+                            ),
+                            border_color=rx.cond(
+                                QuizState.playstyle == "casual",
+                                "#60a5fa",
+                                "rgba(255, 255, 255, 0.05)",
+                            ),
+                            color=rx.cond(
+                                QuizState.playstyle == "casual",
+                                "white",
+                                "#6b7280",
+                            ),
+                        ),
+                        rx.button(
+                            rx.box(
+                                rx.text(
+                                    "Balanced",
+                                    font_size="1.125rem",
+                                    font_weight="900",
+                                    margin_bottom="0.25rem",
+                                    letter_spacing="-0.025em",
+                                    text_transform="capitalize",
+                                ),
+                                rx.text(
+                                    "Enjoy meaningful challenges with a steady learning curve.",
+                                    font_size="0.75rem",
+                                    opacity="0.7",
+                                    font_weight="500",
+                                ),
+                                text_align="left",
+                            ),
+                            on_click=lambda: QuizState.set_playstyle("balanced"),
+                            width="100%",
+                            padding="1.25rem",
+                            border_radius="0.125rem",
+                            border_width="1px",
+                            text_align="left",
+                            transition="all 0.3s",
+                            background=rx.cond(
+                                QuizState.playstyle == "balanced",
+                                "#2563eb",
+                                "rgba(31, 41, 55, 0.3)",
+                            ),
+                            border_color=rx.cond(
+                                QuizState.playstyle == "balanced",
+                                "#60a5fa",
+                                "rgba(255, 255, 255, 0.05)",
+                            ),
+                            color=rx.cond(
+                                QuizState.playstyle == "balanced",
+                                "white",
+                                "#6b7280",
+                            ),
+                        ),
+                        rx.button(
+                            rx.box(
+                                rx.text(
+                                    "Hardcore",
+                                    font_size="1.125rem",
+                                    font_weight="900",
+                                    margin_bottom="0.25rem",
+                                    letter_spacing="-0.025em",
+                                    text_transform="capitalize",
+                                ),
+                                rx.text(
+                                    "Demand precision, depth, and punishingly rewarding mastery.",
+                                    font_size="0.75rem",
+                                    opacity="0.7",
+                                    font_weight="500",
+                                ),
+                                text_align="left",
+                            ),
+                            on_click=lambda: QuizState.set_playstyle("hardcore"),
+                            width="100%",
+                            padding="1.25rem",
+                            border_radius="0.125rem",
+                            border_width="1px",
+                            text_align="left",
+                            transition="all 0.3s",
+                            background=rx.cond(
+                                QuizState.playstyle == "hardcore",
+                                "#2563eb",
+                                "rgba(31, 41, 55, 0.3)",
+                            ),
+                            border_color=rx.cond(
+                                QuizState.playstyle == "hardcore",
+                                "#60a5fa",
+                                "rgba(255, 255, 255, 0.05)",
+                            ),
+                            color=rx.cond(
+                                QuizState.playstyle == "hardcore",
+                                "white",
+                                "#6b7280",
+                            ),
+                        ),
+                        spacing="4",
+                        width="100%",
+                        margin_bottom="2rem",
+                    ),
+                ),
+            ),
+            # Step 2: Time availability
+            rx.cond(
+                QuizState.quiz_step == 2,
+                rx.box(
+                    rx.heading(
+                        "Temporal Allocation",
+                        size="8",
+                        font_weight="900",
+                        margin_bottom="0.5rem",
+                        color="white",
+                        text_transform="uppercase",
+                        letter_spacing="-0.025em",
+                    ),
+                    rx.text(
+                        "How much time can you commit to a single title?",
+                        color="#9ca3af",
+                        margin_bottom="2rem",
+                        font_size="0.875rem",
+                    ),
+                    rx.vstack(
+                        rx.button(
+                            rx.box(
+                                rx.text(
+                                    "Bite-Sized (< 15 hrs)",
+                                    font_size="1.125rem",
+                                    font_weight="900",
+                                    letter_spacing="-0.025em",
+                                    text_transform="uppercase",
+                                    margin_bottom="0.25rem",
+                                ),
+                                rx.text(
+                                    "High-impact, concise experiences that respect your time.",
+                                    font_size="0.75rem",
+                                    opacity="0.7",
+                                    font_weight="500",
+                                ),
+                                text_align="left",
+                            ),
+                            on_click=lambda: QuizState.set_time_availability("short"),
+                            width="100%",
+                            padding="1.25rem",
+                            border_radius="0.125rem",
+                            border_width="1px",
+                            text_align="left",
+                            transition="all 0.3s",
+                            background=rx.cond(
+                                QuizState.time_availability == "short",
+                                "#2563eb",
+                                "rgba(31, 41, 55, 0.3)",
+                            ),
+                            border_color=rx.cond(
+                                QuizState.time_availability == "short",
+                                "#60a5fa",
+                                "rgba(255, 255, 255, 0.05)",
+                            ),
+                            color=rx.cond(
+                                QuizState.time_availability == "short",
+                                "white",
+                                "#6b7280",
+                            ),
+                        ),
+                        rx.button(
+                            rx.box(
+                                rx.text(
+                                    "Standard (15 - 50 hrs)",
+                                    font_size="1.125rem",
+                                    font_weight="900",
+                                    letter_spacing="-0.025em",
+                                    text_transform="uppercase",
+                                    margin_bottom="0.25rem",
+                                ),
+                                rx.text(
+                                    "Deep narratives or systems designed for several weeks of play.",
+                                    font_size="0.75rem",
+                                    opacity="0.7",
+                                    font_weight="500",
+                                ),
+                                text_align="left",
+                            ),
+                            on_click=lambda: QuizState.set_time_availability("medium"),
+                            width="100%",
+                            padding="1.25rem",
+                            border_radius="0.125rem",
+                            border_width="1px",
+                            text_align="left",
+                            transition="all 0.3s",
+                            background=rx.cond(
+                                QuizState.time_availability == "medium",
+                                "#2563eb",
+                                "rgba(31, 41, 55, 0.3)",
+                            ),
+                            border_color=rx.cond(
+                                QuizState.time_availability == "medium",
+                                "#60a5fa",
+                                "rgba(255, 255, 255, 0.05)",
+                            ),
+                            color=rx.cond(
+                                QuizState.time_availability == "medium",
+                                "white",
+                                "#6b7280",
+                            ),
+                        ),
+                        rx.button(
+                            rx.box(
+                                rx.text(
+                                    "Epic (50+ hrs)",
+                                    font_size="1.125rem",
+                                    font_weight="900",
+                                    letter_spacing="-0.025em",
+                                    text_transform="uppercase",
+                                    margin_bottom="0.25rem",
+                                ),
+                                rx.text(
+                                    "Infinite loops or massive worlds for long-term immersion.",
+                                    font_size="0.75rem",
+                                    opacity="0.7",
+                                    font_weight="500",
+                                ),
+                                text_align="left",
+                            ),
+                            on_click=lambda: QuizState.set_time_availability("long"),
+                            width="100%",
+                            padding="1.25rem",
+                            border_radius="0.125rem",
+                            border_width="1px",
+                            text_align="left",
+                            transition="all 0.3s",
+                            background=rx.cond(
+                                QuizState.time_availability == "long",
+                                "#2563eb",
+                                "rgba(31, 41, 55, 0.3)",
+                            ),
+                            border_color=rx.cond(
+                                QuizState.time_availability == "long",
+                                "#60a5fa",
+                                "rgba(255, 255, 255, 0.05)",
+                            ),
+                            color=rx.cond(
+                                QuizState.time_availability == "long",
+                                "white",
+                                "#6b7280",
+                            ),
+                        ),
+                        spacing="4",
+                        width="100%",
+                        margin_bottom="2rem",
+                    ),
+                ),
+            ),
+            # Step 3: Specific keywords
+            rx.cond(
+                QuizState.quiz_step == 3,
+                rx.box(
+                    rx.heading(
+                        "Specific Directives",
+                        size="8",
+                        font_weight="900",
+                        margin_bottom="0.5rem",
+                        color="white",
+                        text_transform="uppercase",
+                        letter_spacing="-0.025em",
+                    ),
+                    rx.text(
+                        "Mention themes, settings, or specific 'vibes' (e.g., Cyberpunk, Retro, Dark).",
+                        color="#9ca3af",
+                        margin_bottom="2rem",
+                        font_size="0.875rem",
+                    ),
+                    rx.text_area(
+                        value=QuizState.specific_keywords,
+                        on_change=QuizState.set_specific_keywords,
+                        placeholder="E.g. I want something with a deep loot system and a depressing atmosphere...",
+                        width="100%",
+                        background="rgba(0, 0, 0, 0.4)",
+                        border="1px solid rgba(255, 255, 255, 0.1)",
+                        border_radius="0.125rem",
+                        padding="1.25rem",
+                        color="white",
+                        margin_bottom="2rem",
+                        height="10rem",
+                        font_weight="500",
+                        _focus={
+                            "outline": "none",
+                            "border_color": "#3b82f6",
+                        },
+                    ),
+                ),
+            ),
+            min_height="300px",
+        ),
+        # Navigation buttons
+        rx.flex(
+            rx.cond(
+                QuizState.quiz_step > 0,
+                rx.button(
+                    "Previous",
+                    on_click=QuizState.prev_step,
+                    padding_x="2rem",
+                    padding_y="0.75rem",
+                    font_size="0.75rem",
+                    font_weight="900",
+                    color="#6b7280",
+                    text_transform="uppercase",
+                    letter_spacing="0.1em",
+                    background="transparent",
+                    _hover={
+                        "color": "white",
+                    },
+                    transition="colors 0.3s",
+                ),
+                rx.box(),
+            ),
+            rx.cond(
+                QuizState.quiz_step < 3,
+                rx.button(
+                    "Advance",
+                    on_click=QuizState.next_step,
+                    disabled=~QuizState.can_advance,
+                    padding_x="2.5rem",
+                    padding_y="1rem",
+                    border_radius="0.125rem",
+                    font_weight="900",
+                    font_size="0.875rem",
+                    text_transform="uppercase",
+                    letter_spacing="0.1em",
+                    transition="all 0.3s",
+                    background=rx.cond(
+                        QuizState.can_advance,
+                        "#2563eb",
+                        "#1f2937",
+                    ),
+                    color=rx.cond(
+                        QuizState.can_advance,
+                        "white",
+                        "#4b5563",
+                    ),
+                    cursor=rx.cond(
+                        QuizState.can_advance,
+                        "pointer",
+                        "not-allowed",
+                    ),
+                    _hover={
+                        "background": rx.cond(
+                            QuizState.can_advance,
+                            "#1d4ed8",
+                            "#1f2937",
+                        ),
+                    },
+                    box_shadow="0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+                ),
+                rx.button(
+                    "Initialize Recommendations",
+                    on_click=QuizState.submit_quiz,
+                    padding_x="3rem",
+                    padding_y="1rem",
+                    background="#2563eb",
+                    color="white",
+                    border_radius="0.125rem",
+                    font_weight="900",
+                    font_size="0.875rem",
+                    text_transform="uppercase",
+                    letter_spacing="0.1em",
+                    box_shadow="0 25px 50px -12px rgba(37, 99, 235, 0.3)",
+                    transition="all 0.3s",
+                    _hover={
+                        "background": "#1d4ed8",
+                    },
+                ),
+            ),
+            justify="space-between",
+            align_items="center",
+            padding_top="1.5rem",
+            border_top="1px solid rgba(255, 255, 255, 0.05)",
+        ),
+        max_width="42rem",
+        margin_x="auto",
+        background_color="rgba(22, 32, 45, 0.8)",
+        padding="2rem",
+        border_radius="0.75rem",
+        box_shadow="0 0 30px rgba(102, 192, 244, 0.15)",
+    )
